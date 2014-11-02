@@ -13,9 +13,9 @@ namespace Switchboard.ConsoleHost
             // Dump all debug data to the console, coloring it if possible
             Trace.Listeners.Add(new ConsoleLogger());
 
-            var endPoint = new IPEndPoint(IPAddress.Loopback, 8080);
-            var handler = new SimpleReverseProxyHandler("http://www.nytimes.com");
-            var server = new SwitchboardServer(endPoint, handler);
+            var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
+			//var handler = new SimpleReverseProxyHandler("http://www.nytimes.com");
+            var server = new SwitchboardServer(endPoint, new HedProxyHandler());
 
             server.Start();
 
