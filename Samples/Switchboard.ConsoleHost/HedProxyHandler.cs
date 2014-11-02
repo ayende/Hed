@@ -22,7 +22,8 @@ namespace Switchboard.ConsoleHost
 	public class HedProxyHandler : ISwitchboardRequestHandler
 	{
 		private readonly string config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "topology.json");
-		private Regex _pathMatch = new Regex(@"^/(\d+)(/.+)");
+		private readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random());
+		private readonly Regex _pathMatch = new Regex(@"^/(\d+)(/.+)");
 
 		private readonly ProxyTopology _topology = new ProxyTopology
 		{
@@ -45,7 +46,6 @@ namespace Switchboard.ConsoleHost
 			}
 		}
 
-		private ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random());
 
 		public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, SwitchboardRequest request)
 		{
