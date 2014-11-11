@@ -15,10 +15,11 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Switchboard.Server;
 
 namespace Hed.ConsoleHost
 {
-	public class HedProxyHandler : ISwitchboardRequestHandler
+	public class HedProxyHandler : IHedRequestHandler
 	{
 		private readonly string config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "topology.json");
 		private readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random());
@@ -46,7 +47,7 @@ namespace Hed.ConsoleHost
 		}
 
 
-		public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, SwitchboardRequest request)
+		public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, HedRequest request)
 		{
 			var match = _pathMatch.Match(request.RequestUri);
 			if (match.Success == false)
@@ -95,7 +96,7 @@ namespace Hed.ConsoleHost
 			}
 		}
 
-	    private async Task<SwitchboardResponse> DownResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+	    private async Task<SwitchboardResponse> DownResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
 	    {
             var behavior = _random.Value.Next(1, 101);
 	        if (behavior <= 50)
@@ -126,7 +127,7 @@ namespace Hed.ConsoleHost
 	        throw new SwitchboardServer.AbandonConnectionException();
 	    }
 
-	    private async Task<SwitchboardResponse> NormalResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+	    private async Task<SwitchboardResponse> NormalResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
         {
             var behavior = _random.Value.Next(1, 101);
             if (behavior <= 95)
@@ -145,7 +146,7 @@ namespace Hed.ConsoleHost
 
         }
         // 30% chance dropped connection, 30% chance 503 error, 30% chance close TCP, 10% normal
-        private async Task<SwitchboardResponse> DroppingResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+        private async Task<SwitchboardResponse> DroppingResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
 	    {
 	        var behavior = _random.Value.Next(1, 101);
             if (behavior <= 30)
@@ -168,7 +169,7 @@ namespace Hed.ConsoleHost
             return await NormalResponse(context, request, path);
 	    }
 
-        private async Task<SwitchboardResponse> HiccupResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+        private async Task<SwitchboardResponse> HiccupResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
 	    {
             var behavior = _random.Value.Next(1, 101);
             if (behavior <= 15)
@@ -191,7 +192,7 @@ namespace Hed.ConsoleHost
             return await NormalResponse(context, request, path);
 	    }
 
-	    private async Task CutRequestBodyByHalf(SwitchboardRequest request, int bufferSize = 4096)
+	    private async Task CutRequestBodyByHalf(HedRequest request, int bufferSize = 4096)
 	    {
 	        if (null == request.RequestBody) return;
             byte[] buffer = new byte[bufferSize];
@@ -207,7 +208,7 @@ namespace Hed.ConsoleHost
             }
 	        request.RequestBody = stream;
 	    }
-	    private async Task<SwitchboardResponse> SlowResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+	    private async Task<SwitchboardResponse> SlowResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
 	    {
 	        var wait = _random.Value.Next(500, 5000);
 	        Debug.WriteLine("Waiting for {0:#,#;;0}ms under slow behavior", wait);
@@ -217,7 +218,7 @@ namespace Hed.ConsoleHost
 	        return result;
 	    }
 
-	    private static async Task<SwitchboardResponse> OptimalResponse(SwitchboardContext context, SwitchboardRequest request, ProxyPath path)
+	    private static async Task<SwitchboardResponse> OptimalResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
 		{
 			await OpenOutboundConnection(context, path);
 			await context.OutboundConnection.WriteRequestAsync(request);

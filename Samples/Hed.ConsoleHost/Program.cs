@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using Hed.ConsoleHost.Logging;
+using Switchboard.Server;
 
 namespace Hed.ConsoleHost
 {

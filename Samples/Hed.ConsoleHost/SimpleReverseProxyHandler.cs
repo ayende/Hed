@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using Switchboard.Server;
 
 namespace Hed.ConsoleHost
 {
@@ -9,7 +10,7 @@ namespace Hed.ConsoleHost
     /// Sample implementation of a reverse proxy. Streams requests and responses (no buffering).
     /// No support for location header rewriting.
     /// </summary>
-    public class SimpleReverseProxyHandler : ISwitchboardRequestHandler
+    public class SimpleReverseProxyHandler : IHedRequestHandler
     {
         private Uri backendUri;
 
@@ -29,7 +30,7 @@ namespace Hed.ConsoleHost
             this.AddForwardedForHeader = true;
         }
 
-        public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, SwitchboardRequest request)
+        public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, HedRequest request)
         {
             var originalHost = request.Headers["Host"];
 
@@ -70,7 +71,7 @@ namespace Hed.ConsoleHost
             return response;
         }
 
-        private void SetForwardedForHeader(SwitchboardContext context, SwitchboardRequest request)
+        private void SetForwardedForHeader(SwitchboardContext context, HedRequest request)
         {
             string remoteAddress = context.InboundConnection.RemoteEndPoint.Address.ToString();
             string currentForwardedFor = request.Headers["X-Forwarded-For"];

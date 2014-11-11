@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Hed.Server.Utils
 {
-    internal class ChunkedStream : Stream
+	public class ChunkedStream : Stream
     {
         private Stream innerStream;
         private bool inChunkHeader = true;

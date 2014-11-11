@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Switchboard.Server.Utils;
-using Switchboard.Server.Utils.HttpParser;
+using Hed.Server.Utils;
+using Hed.Server.Utils.HttpParser;
 
 namespace Switchboard.Server
 {

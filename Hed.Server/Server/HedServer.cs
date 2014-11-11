@@ -4,19 +4,20 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Hed.Server.Connection;
 using Switchboard.Server.Connection;
 
 namespace Switchboard.Server
 {
     public class SwitchboardServer
     {
-        private ISwitchboardRequestHandler handler;
+        private IHedRequestHandler handler;
         private TcpListener server;
         private Task workTask;
         private bool stopping;
         private Timer connectivityTimer;
 
-        public SwitchboardServer(IPEndPoint listenEp, ISwitchboardRequestHandler handler)
+        public SwitchboardServer(IPEndPoint listenEp, IHedRequestHandler handler)
         {
             this.server = new TcpListener(listenEp);
             this.handler = handler;

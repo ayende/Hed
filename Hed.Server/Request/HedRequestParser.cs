@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Hed.Server.Connection;
+using Hed.Server.Utils;
 using HttpMachine;
-using Switchboard.Server.Connection;
-using Switchboard.Server.Utils;
 
 namespace Switchboard.Server
 {
@@ -14,7 +14,7 @@ namespace Switchboard.Server
         {
             private string headerName;
 
-            public SwitchboardRequest request = new SwitchboardRequest();
+            public HedRequest request = new HedRequest();
             public ArraySegment<byte> requestBodyStart;
             public bool complete;
             public bool headerComplete;
@@ -35,7 +35,7 @@ namespace Switchboard.Server
         {
         }
 
-        public async Task<SwitchboardRequest> ParseAsync(InboundConnection conn, Stream stream)
+        public async Task<HedRequest> ParseAsync(InboundConnection conn, Stream stream)
         {
             var del = new ParseDelegate();
             var parser = new HttpParser(del);

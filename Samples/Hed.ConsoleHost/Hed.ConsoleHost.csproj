@@ -7,7 +7,7 @@
     <ProjectGuid>{3BF99ED4-6966-4B2B-BFCB-DB69B39D999A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    RootNamespace>Hed.ConsoleHost</RootNamespace>
+    <RootNamespace>Hed.ConsoleHost</RootNamespace>
     <AssemblyName>Hed.ConsoleHost</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

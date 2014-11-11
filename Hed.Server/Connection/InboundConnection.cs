@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Hed.Server.Utils;
+using Switchboard.Server;
+using Switchboard.Server.Connection;
 
 namespace Hed.Server.Connection
 {
@@ -67,12 +69,12 @@ namespace Hed.Server.Connection
         }
 
 
-        public Task<SwitchboardRequest> ReadRequestAsync()
+        public Task<HedRequest> ReadRequestAsync()
         {
             return ReadRequestAsync(CancellationToken.None);
         }
 
-        public Task<SwitchboardRequest> ReadRequestAsync(CancellationToken ct)
+        public Task<HedRequest> ReadRequestAsync(CancellationToken ct)
         {
             var requestParser = new SwitchboardRequestParser();
 

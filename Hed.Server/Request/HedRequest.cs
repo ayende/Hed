@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Switchboard.Server
 {
-    public class SwitchboardRequest
+    public class HedRequest
     {
         private static long requestCounter;
 
@@ -41,7 +41,7 @@ namespace Switchboard.Server
             }
         }
 
-        public SwitchboardRequest()
+        public HedRequest()
         {
             this.Headers = new WebHeaderCollection();
             this.RequestId = Interlocked.Increment(ref requestCounter);

@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Switchboard.Server;
+using Switchboard.Server.Connection;
 
 namespace Hed.Server.Connection
 {
@@ -42,12 +44,12 @@ namespace Hed.Server.Connection
             this.networkStream = this.connection.GetStream();
         }
 
-        public Task WriteRequestAsync(SwitchboardRequest request)
+        public Task WriteRequestAsync(HedRequest request)
         {
             return WriteRequestAsync(request, CancellationToken.None);
         }
 
-        public async Task WriteRequestAsync(SwitchboardRequest request, CancellationToken ct)
+        public async Task WriteRequestAsync(HedRequest request, CancellationToken ct)
         {
             var writeStream = this.GetWriteStream();
 
