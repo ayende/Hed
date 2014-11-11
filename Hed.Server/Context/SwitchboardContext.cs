@@ -100,7 +100,7 @@ namespace Switchboard.Server
                 this.OutboundConnection.Close();
         }
 
-        internal void Dispose()
+        public void Dispose()
         {
             this.Close();
         }

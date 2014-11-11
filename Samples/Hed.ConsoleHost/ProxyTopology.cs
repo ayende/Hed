@@ -32,7 +32,7 @@ namespace Hed.ConsoleHost
 				 // 15% chance send request, but if has body, only send half, and stop
 				 // rest, normal
 		Dropping, // 30% chance dropped connection, 30% chance 503 error, 30% chance close TCP, 10% normal
-		Down, // 50% no dropped connection, 30% close TCP, rest 503 error
+		Down, // 50% dropped connection, 30% close TCP, rest 503 error
 
 	}
 }
