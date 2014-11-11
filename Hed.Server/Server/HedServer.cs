@@ -5,11 +5,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Hed.Server.Connection;
-using Switchboard.Server.Connection;
+using Hed.Server.Context;
+using Hed.Server.Handlers;
 
-namespace Switchboard.Server
+namespace Hed.Server.Server
 {
-    public class SwitchboardServer
+    public class HedServer
     {
         private IHedRequestHandler handler;
         private TcpListener server;
@@ -17,7 +18,7 @@ namespace Switchboard.Server
         private bool stopping;
         private Timer connectivityTimer;
 
-        public SwitchboardServer(IPEndPoint listenEp, IHedRequestHandler handler)
+        public HedServer(IPEndPoint listenEp, IHedRequestHandler handler)
         {
             this.server = new TcpListener(listenEp);
             this.handler = handler;
@@ -40,7 +41,7 @@ namespace Switchboard.Server
 
                 Debug.WriteLine("{0}: Connected", inbound.RemoteEndPoint);
 
-                var context = new SwitchboardContext(inbound);
+                var context = new HedContext(inbound);
 
                 var ignored = HandleSession(context);
             }
@@ -55,7 +56,7 @@ namespace Switchboard.Server
         {
         }
 
-        private async Task HandleSession(SwitchboardContext context)
+        private async Task HandleSession(HedContext context)
         {
             bool abandon = false;
             try

@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using Hed.Server.Utils;
 using Hed.Server.Utils.HttpParser;
 
-namespace Switchboard.Server
+namespace Hed.Server.Response
 {
-    internal class SwitchboardResponseParser
+    internal class HedResponseParser
     {
         private sealed class ParseDelegate : IHttpResponseHandler
         {
             public bool headerComplete;
-            public SwitchboardResponse response = new SwitchboardResponse();
+            public HedResponse response = new HedResponse();
             public ArraySegment<byte> responseBodyStart;
 
             public void OnResponseBegin() { }
@@ -51,11 +51,11 @@ namespace Switchboard.Server
             }
         }
 
-        public SwitchboardResponseParser()
+        public HedResponseParser()
         {
         }
 
-        public async Task<SwitchboardResponse> ParseAsync(Stream stream)
+        public async Task<HedResponse> ParseAsync(Stream stream)
         {
             var del = new ParseDelegate();
             var parser = new HttpResponseParser(del);

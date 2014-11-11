@@ -1,9 +1,12 @@
 ﻿using System.Threading.Tasks;
+using Hed.Server.Context;
+using Hed.Server.Request;
+using Hed.Server.Response;
 
-namespace Switchboard.Server
+namespace Hed.Server.Handlers
 {
     public interface IHedRequestHandler
     {
-        Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, HedRequest request);
+        Task<HedResponse> GetResponseAsync(HedContext context, HedRequest request);
     }
 }

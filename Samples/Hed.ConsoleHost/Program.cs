@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using Hed.ConsoleHost.Logging;
-using Switchboard.Server;
+using Hed.Server.Server;
 
 namespace Hed.ConsoleHost
 {
@@ -15,7 +15,7 @@ namespace Hed.ConsoleHost
 
             var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
 			//var handler = new SimpleReverseProxyHandler("http://www.nytimes.com");
-            var server = new SwitchboardServer(endPoint, new HedProxyHandler());
+            var server = new HedServer(endPoint, new HedProxyHandler());
 
             server.Start();
 

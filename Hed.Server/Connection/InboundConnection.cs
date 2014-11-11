@@ -5,13 +5,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Hed.Server.Request;
+using Hed.Server.Response;
 using Hed.Server.Utils;
-using Switchboard.Server;
-using Switchboard.Server.Connection;
 
 namespace Hed.Server.Connection
 {
-    public class InboundConnection : SwitchboardConnection
+    public class InboundConnection : HedConnection
     {
         private static long connectionCounter;
         protected static readonly Encoding headerEncoding = Encoding.GetEncoding("us-ascii");
@@ -76,18 +76,18 @@ namespace Hed.Server.Connection
 
         public Task<HedRequest> ReadRequestAsync(CancellationToken ct)
         {
-            var requestParser = new SwitchboardRequestParser();
+            var requestParser = new HedRequestParser();
 
             return requestParser.ParseAsync(this, this.GetReadStream());
         }
 
-        public async Task WriteResponseAsync(SwitchboardResponse response)
+        public async Task WriteResponseAsync(HedResponse response)
         {
             await WriteResponseAsync(response, CancellationToken.None)
                 .ConfigureAwait(false);
         }
 
-        public async Task WriteResponseAsync(SwitchboardResponse response, CancellationToken ct)
+        public async Task WriteResponseAsync(HedResponse response, CancellationToken ct)
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms, headerEncoding);

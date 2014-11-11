@@ -14,8 +14,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Hed.Server.Context;
+using Hed.Server.Handlers;
+using Hed.Server.Request;
+using Hed.Server.Response;
+using Hed.Server.Server;
 using Newtonsoft.Json;
-using Switchboard.Server;
 
 namespace Hed.ConsoleHost
 {
@@ -47,12 +51,12 @@ namespace Hed.ConsoleHost
 		}
 
 
-		public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, HedRequest request)
+		public async Task<HedResponse> GetResponseAsync(HedContext context, HedRequest request)
 		{
 			var match = _pathMatch.Match(request.RequestUri);
 			if (match.Success == false)
 			{
-				return new SwitchboardResponse
+				return new HedResponse
 				{
 					StatusCode = 500,
 					StatusDescription = "InternalServerError",
@@ -63,7 +67,7 @@ namespace Hed.ConsoleHost
 			ProxyPath path;
 			if (_topology.Paths.TryGetValue(match.Groups[1].Value, out path) == false)
 			{
-				return new SwitchboardResponse
+				return new HedResponse
 				{
 					StatusCode = 500,
 					StatusDescription = "InternalServerError",
@@ -96,7 +100,7 @@ namespace Hed.ConsoleHost
 			}
 		}
 
-	    private async Task<SwitchboardResponse> DownResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+	    private async Task<HedResponse> DownResponse(HedContext context, HedRequest request, ProxyPath path)
 	    {
             var behavior = _random.Value.Next(1, 101);
 	        if (behavior <= 50)
@@ -107,7 +111,7 @@ namespace Hed.ConsoleHost
 	        {
 	            CloseTcpClient(context);
 	        }
-	        return new SwitchboardResponse
+	        return new HedResponse
             {
                 StatusCode = 503,
                 StatusDescription = "ServiceUnavailable",
@@ -118,16 +122,16 @@ namespace Hed.ConsoleHost
 
 	    private static void DropConnection()
 	    {
-	        throw new SwitchboardServer.AbandonConnectionException();
+	        throw new HedServer.AbandonConnectionException();
 	    }
 
-	    private static void CloseTcpClient(SwitchboardContext context)
+	    private static void CloseTcpClient(HedContext context)
 	    {
 	        context.Dispose();
-	        throw new SwitchboardServer.AbandonConnectionException();
+	        throw new HedServer.AbandonConnectionException();
 	    }
 
-	    private async Task<SwitchboardResponse> NormalResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+	    private async Task<HedResponse> NormalResponse(HedContext context, HedRequest request, ProxyPath path)
         {
             var behavior = _random.Value.Next(1, 101);
             if (behavior <= 95)
@@ -146,7 +150,7 @@ namespace Hed.ConsoleHost
 
         }
         // 30% chance dropped connection, 30% chance 503 error, 30% chance close TCP, 10% normal
-        private async Task<SwitchboardResponse> DroppingResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+        private async Task<HedResponse> DroppingResponse(HedContext context, HedRequest request, ProxyPath path)
 	    {
 	        var behavior = _random.Value.Next(1, 101);
             if (behavior <= 30)
@@ -154,7 +158,7 @@ namespace Hed.ConsoleHost
             }
             else if (behavior <= 60)
             {
-                return new SwitchboardResponse
+                return new HedResponse
                 {
                     StatusCode = 503,
                     StatusDescription = "ServiceUnavailable",
@@ -169,7 +173,7 @@ namespace Hed.ConsoleHost
             return await NormalResponse(context, request, path);
 	    }
 
-        private async Task<SwitchboardResponse> HiccupResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+        private async Task<HedResponse> HiccupResponse(HedContext context, HedRequest request, ProxyPath path)
 	    {
             var behavior = _random.Value.Next(1, 101);
             if (behavior <= 15)
@@ -208,7 +212,7 @@ namespace Hed.ConsoleHost
             }
 	        request.RequestBody = stream;
 	    }
-	    private async Task<SwitchboardResponse> SlowResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+	    private async Task<HedResponse> SlowResponse(HedContext context, HedRequest request, ProxyPath path)
 	    {
 	        var wait = _random.Value.Next(500, 5000);
 	        Debug.WriteLine("Waiting for {0:#,#;;0}ms under slow behavior", wait);
@@ -218,7 +222,7 @@ namespace Hed.ConsoleHost
 	        return result;
 	    }
 
-	    private static async Task<SwitchboardResponse> OptimalResponse(SwitchboardContext context, HedRequest request, ProxyPath path)
+	    private static async Task<HedResponse> OptimalResponse(HedContext context, HedRequest request, ProxyPath path)
 		{
 			await OpenOutboundConnection(context, path);
 			await context.OutboundConnection.WriteRequestAsync(request);
@@ -226,7 +230,7 @@ namespace Hed.ConsoleHost
 			return response;
 		}
 
-		private static async Task OpenOutboundConnection(SwitchboardContext context, ProxyPath path)
+		private static async Task OpenOutboundConnection(HedContext context, ProxyPath path)
 		{
 			IPAddress ip;
 			if (path.To.HostNameType == UriHostNameType.IPv4)

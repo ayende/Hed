@@ -2,7 +2,10 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Switchboard.Server;
+using Hed.Server.Context;
+using Hed.Server.Handlers;
+using Hed.Server.Request;
+using Hed.Server.Response;
 
 namespace Hed.ConsoleHost
 {
@@ -30,7 +33,7 @@ namespace Hed.ConsoleHost
             this.AddForwardedForHeader = true;
         }
 
-        public async Task<SwitchboardResponse> GetResponseAsync(SwitchboardContext context, HedRequest request)
+        public async Task<HedResponse> GetResponseAsync(HedContext context, HedRequest request)
         {
             var originalHost = request.Headers["Host"];
 
@@ -71,7 +74,7 @@ namespace Hed.ConsoleHost
             return response;
         }
 
-        private void SetForwardedForHeader(SwitchboardContext context, HedRequest request)
+        private void SetForwardedForHeader(HedContext context, HedRequest request)
         {
             string remoteAddress = context.InboundConnection.RemoteEndPoint.Address.ToString();
             string currentForwardedFor = request.Headers["X-Forwarded-For"];

@@ -4,11 +4,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Hed.Server.Connection;
-using Switchboard.Server.Connection;
 
-namespace Switchboard.Server
+namespace Hed.Server.Context
 {
-    public class SwitchboardContext
+    public class HedContext
     {
         private static long contextCounter;
         public long ContextId { get; private set; }
@@ -18,7 +17,7 @@ namespace Switchboard.Server
 
         private Timer CheckForDisconnectTimer;
 
-        public SwitchboardContext(InboundConnection client)
+        public HedContext(InboundConnection client)
         {
             this.InboundConnection = client;
             this.ContextId = Interlocked.Increment(ref contextCounter);

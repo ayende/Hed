@@ -4,9 +4,9 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server
+namespace Hed.Server.Response
 {
-    public class SwitchboardResponse
+    public class HedResponse
     {
         private static long responseCounter;
 
@@ -24,11 +24,11 @@ namespace Switchboard.Server
 
         public bool IsResponseBuffered { get; private set; }
 
-        static SwitchboardResponse()
+        static HedResponse()
         {
         }
 
-        public SwitchboardResponse()
+        public HedResponse()
         {
             this.Headers = new WebHeaderCollection();
             this.ResponseId = Interlocked.Increment(ref responseCounter);

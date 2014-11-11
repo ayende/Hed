@@ -4,12 +4,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Switchboard.Server;
-using Switchboard.Server.Connection;
+using Hed.Server.Request;
+using Hed.Server.Response;
 
 namespace Hed.Server.Connection
 {
-    public class OutboundConnection : SwitchboardConnection
+    public class OutboundConnection : HedConnection
     {
         protected static readonly Encoding headerEncoding = Encoding.GetEncoding("us-ascii");
 
@@ -88,9 +88,9 @@ namespace Hed.Server.Connection
             return this.networkStream;
         }
 
-        public Task<SwitchboardResponse> ReadResponseAsync()
+        public Task<HedResponse> ReadResponseAsync()
         {
-            var parser = new SwitchboardResponseParser();
+            var parser = new HedResponseParser();
             return parser.ParseAsync(this.GetReadStream());
         }
 

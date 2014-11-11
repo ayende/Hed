@@ -6,9 +6,9 @@ using Hed.Server.Connection;
 using Hed.Server.Utils;
 using HttpMachine;
 
-namespace Switchboard.Server
+namespace Hed.Server.Request
 {
-    internal class SwitchboardRequestParser
+    internal class HedRequestParser
     {
         private sealed class ParseDelegate : IHttpParserHandler
         {
@@ -31,7 +31,7 @@ namespace Switchboard.Server
             void IHttpParserHandler.OnRequestUri(HttpParser parser, string requestUri) { request.RequestUri = requestUri; }
         }
 
-        public SwitchboardRequestParser()
+        public HedRequestParser()
         {
         }
 

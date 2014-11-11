@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server
+namespace Hed.Server.Request
 {
     public class HedRequest
     {
