@@ -32,16 +32,16 @@ namespace Switchboard.Server
         {
             while (!ct.IsCancellationRequested)
             {
-                var client = await this.server.AcceptTcpClientAsync();
+                var client = await server.AcceptTcpClientAsync();
 
                 var inbound = await CreateInboundConnection(client);
-                await inbound.OpenAsync();
+                await inbound.OpenAsync(ct);
 
-                Debug.WriteLine(string.Format("{0}: Connected", inbound.RemoteEndPoint));
+                Debug.WriteLine("{0}: Connected", inbound.RemoteEndPoint);
 
                 var context = new SwitchboardContext(inbound);
 
-                HandleSession(context);
+                var ignored = HandleSession(context);
             }
         }
 
@@ -50,8 +50,13 @@ namespace Switchboard.Server
             return Task.FromResult<InboundConnection>(new InboundConnection(client));
         }
 
-        private async void HandleSession(SwitchboardContext context)
+        public class AbandonConnectionException : Exception
         {
+        }
+
+        private async Task HandleSession(SwitchboardContext context)
+        {
+            bool abandon = false;
             try
             {
                 Debug.WriteLine("{0}: Starting session", context.InboundConnection.RemoteEndPoint);
@@ -63,28 +68,36 @@ namespace Switchboard.Server
                     if (request == null)
                         return;
 
-                    Debug.WriteLine(string.Format("{0}: Got {1} request for {2}", context.InboundConnection.RemoteEndPoint, request.Method, request.RequestUri));
+                    Debug.WriteLine("{0}: Got {1} request for {2}", context.InboundConnection.RemoteEndPoint,
+                        request.Method, request.RequestUri);
 
                     var response = await handler.GetResponseAsync(context, request).ConfigureAwait(false);
-                    Debug.WriteLine(string.Format("{0}: Got response from handler ({1})", context.InboundConnection.RemoteEndPoint, response.StatusCode));
+                    Debug.WriteLine("{0}: Got response from handler ({1})", context.InboundConnection.RemoteEndPoint,
+                        response.StatusCode);
 
                     await context.InboundConnection.WriteResponseAsync(response).ConfigureAwait(false);
-                    Debug.WriteLine(string.Format("{0}: Wrote response to client", context.InboundConnection.RemoteEndPoint));
+                    Debug.WriteLine("{0}: Wrote response to client", context.InboundConnection.RemoteEndPoint);
 
                     if (context.OutboundConnection != null && !context.OutboundConnection.IsConnected)
                         context.Close();
 
                 } while (context.InboundConnection.IsConnected);
             }
+            catch (AbandonConnectionException)
+            {
+                Debug.WriteLine("{0}: Connection abandoned", context.InboundConnection.RemoteEndPoint);
+                abandon = true;
+            }
             catch (Exception exc)
             {
-                Debug.WriteLine(string.Format("{0}: Error: {1}", context.InboundConnection.RemoteEndPoint, exc.Message));
+                Debug.WriteLine("{0}: Error: {1}", context.InboundConnection.RemoteEndPoint, exc.Message);
                 context.Close();
-                Debug.WriteLine(string.Format("{0}: Closed context", context.InboundConnection.RemoteEndPoint, exc.Message));
+                Debug.WriteLine("{0}: Closed context", context.InboundConnection.RemoteEndPoint, exc.Message);
             }
             finally
             {
-                context.Dispose();
+                if (abandon == false)
+                    context.Dispose();
             }
         }
 

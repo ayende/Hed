@@ -1,0 +1,7 @@
+﻿{
+    "Paths": {
+         "1": { "From": "http://localhost:8080/databases/a", "To": "http://localhost:8080/databases/b/stats", "Behavior": "Normal" } ,
+         "2": { "From": "http://localhost:8080/databases/b", "To": "http://localhost:8080/databases/c/stats", "Behavior": "Slow" } ,
+         "3": { "From": "http://localhost:8080/databases/c", "To": "http://localhost:8080/databases/b/stats", "Behavior": "Hiccups" } 
+    }
+}
