@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Switchboard.Server.Utils.HttpParser
+namespace Hed.Server.Utils.HttpParser
 {
     /// <summary>
     /// Simple and naive http response parser. No support for chunked transfers or

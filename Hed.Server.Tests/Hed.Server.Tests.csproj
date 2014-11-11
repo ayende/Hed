@@ -6,8 +6,8 @@
     <ProjectGuid>{985186E3-E8F0-485E-8F3C-855DFD31279E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Switchboard.Server.Tests</RootNamespace>
-    <AssemblyName>Switchboard.Server.Tests</AssemblyName>
+    <RootNamespace>Hed.Server.Tests</RootNamespace>
+    <AssemblyName>Hed.Server.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -54,9 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Switchboard.Server\Switchboard.Server.csproj">
+    <ProjectReference Include="..\Hed.Server\Hed.Server.csproj">
       <Project>{29ecd129-85ad-417a-a690-fdee2c97afea}</Project>
-      <Name>Switchboard.Server</Name>
+      <Name>Hed.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

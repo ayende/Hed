@@ -19,13 +19,10 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server.Utils
+namespace Hed.Server.Utils
 {
     /// <summary>
     /// An implementation of a Stream that transparently redirects all 

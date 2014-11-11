@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Switchboard.Server.Utils.HttpParser
+namespace Hed.Server.Utils.HttpParser
 {
     public interface IHttpResponseHandler
     {

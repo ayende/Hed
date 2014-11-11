@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
-using Switchboard.ConsoleHost.Logging;
-using Switchboard.Server;
+using Hed.ConsoleHost.Logging;
 
-namespace Switchboard.ConsoleHost
+namespace Hed.ConsoleHost
 {
     class Program
     {

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switchboard.Server", "Switchboard.Server\Switchboard.Server.csproj", "{29ECD129-85AD-417A-A690-FDEE2C97AFEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hed.Server", "Hed.Server\Hed.Server.csproj", "{29ECD129-85AD-417A-A690-FDEE2C97AFEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switchboard.Server.Tests", "Switchboard.Server.Tests\Switchboard.Server.Tests.csproj", "{985186E3-E8F0-485E-8F3C-855DFD31279E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hed.Server.Tests", "Hed.Server.Tests\Hed.Server.Tests.csproj", "{985186E3-E8F0-485E-8F3C-855DFD31279E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C869D716-6957-4E98-9967-35C0BCE4FB6D}"
 	ProjectSection(SolutionItems) = preProject
@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C869D7
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switchboard.ConsoleHost", "Samples\Switchboard.ConsoleHost\Switchboard.ConsoleHost.csproj", "{3BF99ED4-6966-4B2B-BFCB-DB69B39D999A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hed.ConsoleHost", "Samples\Hed.ConsoleHost\Hed.ConsoleHost.csproj", "{3BF99ED4-6966-4B2B-BFCB-DB69B39D999A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

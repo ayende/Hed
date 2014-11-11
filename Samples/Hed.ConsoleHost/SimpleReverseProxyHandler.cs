@@ -2,9 +2,8 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Switchboard.Server;
 
-namespace Switchboard.ConsoleHost
+namespace Hed.ConsoleHost
 {
     /// <summary>
     /// Sample implementation of a reverse proxy. Streams requests and responses (no buffering).

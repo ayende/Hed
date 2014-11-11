@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server.Utils
+namespace Hed.Server.Utils
 {
     /// <summary>
     /// Used internally by request/response parsers to merge a piece of a buffer and the

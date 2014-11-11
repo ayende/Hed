@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace Switchboard.ConsoleHost.Logging
+namespace Hed.ConsoleHost.Logging
 {
     /// <summary>
     /// Prints debug messages straight to the console. Will color a message

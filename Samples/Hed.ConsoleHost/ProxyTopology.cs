@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Switchboard.ConsoleHost
+namespace Hed.ConsoleHost
 {
 	public class ProxyTopology
 	{

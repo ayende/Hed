@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Switchboard.Server.Utils;
 
-namespace Switchboard.Server.Tests
+namespace Hed.Server.Tests
 {
     [TestClass]
     public class ChunkedStreamTests

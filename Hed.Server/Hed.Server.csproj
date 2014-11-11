@@ -7,8 +7,8 @@
     <ProjectGuid>{29ECD129-85AD-417A-A690-FDEE2C97AFEA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Switchboard.Server</RootNamespace>
-    <AssemblyName>Switchboard.Server</AssemblyName>
+    <RootNamespace>Hed.Server</RootNamespace>
+    <AssemblyName>Hed.Server</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -48,17 +48,17 @@
     <Compile Include="Connection\InboundConnection.cs" />
     <Compile Include="Connection\SecureInboundConnection.cs" />
     <Compile Include="Connection\SecureOutboundConnection.cs" />
-    <Compile Include="Request\SwitchboardRequestParser.cs" />
-    <Compile Include="Response\SwitchboardResponseParser.cs" />
-    <Compile Include="Response\SwitchboardResponse.cs" />
-    <Compile Include="Connection\SwitchboardConnection.cs" />
+    <Compile Include="Request\HedRequestParser.cs" />
+    <Compile Include="Response\HedResponseParser.cs" />
+    <Compile Include="Response\HedResponse.cs" />
+    <Compile Include="Connection\HedConnection.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\SecureSwitchboardServer.cs" />
-    <Compile Include="Context\SwitchboardContext.cs" />
-    <Compile Include="Request\SwitchboardRequest.cs" />
-    <Compile Include="Handlers\ISwitchboardRequestHandler.cs" />
-    <Compile Include="Server\SwitchboardServer.cs" />
+    <Compile Include="Server\SecureHedServer.cs" />
+    <Compile Include="Context\HedContext.cs" />
+    <Compile Include="Request\HedRequest.cs" />
+    <Compile Include="Handlers\IHedRequestHandler.cs" />
+    <Compile Include="Server\HedServer.cs" />
     <Compile Include="Utils\ChunkedStream.cs" />
     <Compile Include="Utils\HttpParser\HttpResponseParser.cs" />
     <Compile Include="Utils\HttpParser\IHttpResponseHandler.cs" />

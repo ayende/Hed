@@ -15,9 +15,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Switchboard.Server;
 
-namespace Switchboard.ConsoleHost
+namespace Hed.ConsoleHost
 {
 	public class HedProxyHandler : ISwitchboardRequestHandler
 	{

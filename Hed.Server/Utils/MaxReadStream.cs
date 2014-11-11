@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server.Utils
+namespace Hed.Server.Utils
 {
     /// <summary>
     /// Simple wrapping stream which prevents reading more than the specified maximum length.

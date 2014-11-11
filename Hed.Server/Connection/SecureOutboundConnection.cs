@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
 using System.Net.Security;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Switchboard.Server.Connection
+namespace Hed.Server.Connection
 {
     public class SecureOutboundConnection : OutboundConnection
     {

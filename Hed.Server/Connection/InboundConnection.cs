@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Switchboard.Server.Utils;
+using Hed.Server.Utils;
 
-namespace Switchboard.Server.Connection
+namespace Hed.Server.Connection
 {
     public class InboundConnection : SwitchboardConnection
     {
