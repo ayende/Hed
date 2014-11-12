@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using Hed.ConsoleHost.Logging;
 using Hed.Server.Server;
+using Microsoft.Owin.Hosting;
 
 namespace Hed.ConsoleHost
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            // Dump all debug data to the console, coloring it if possible
-            Trace.Listeners.Add(new ConsoleLogger());
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			Trace.Listeners.Add(new ConsoleLogger());
+			var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
+			var hedProxyHandler = new HedProxyHandler();
+			var server = new HedServer(endPoint, hedProxyHandler);
+			server.Start();
 
-            var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
-			//var handler = new SimpleReverseProxyHandler("http://www.nytimes.com");
-            var server = new HedServer(endPoint, new HedProxyHandler());
+			using (WebApp.Start<Startup>("http://localhost:9091/"))
+			{
+				Console.ReadLine();
+			}
 
-            server.Start();
-
-            Console.WriteLine("Point your browser at http://{0}", endPoint);
-
-            Console.ReadLine();
-        }
-    }
-
-
+		}
+	}
 }
+

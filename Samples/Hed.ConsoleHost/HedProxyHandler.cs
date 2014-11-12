@@ -25,31 +25,8 @@ namespace Hed.ConsoleHost
 {
 	public class HedProxyHandler : IHedRequestHandler
 	{
-		private readonly string config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "topology.json");
 		private readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random());
 		private readonly Regex _pathMatch = new Regex(@"^/(\d+)(/)(.+)");
-
-		private readonly ProxyTopology _topology = new ProxyTopology
-		{
-			Paths =
-			{
-				{"1", new ProxyPath
-				{
-					From = "http://localhost:8080/databases/abc",
-					To = new Uri("http://localhost:8080/databases/def"),
-					Behavior = ProxyBehavior.Slow
-				}}
-			}
-		};
-
-		public HedProxyHandler()
-		{
-			if (File.Exists(config))
-			{
-				_topology = JsonConvert.DeserializeObject<ProxyTopology>(File.ReadAllText(config));
-			}
-		}
-
 
 		public async Task<HedResponse> GetResponseAsync(HedContext context, HedRequest request)
 		{
@@ -65,7 +42,7 @@ namespace Hed.ConsoleHost
 				};
 			}
 			ProxyPath path;
-			if (_topology.Paths.TryGetValue(match.Groups[1].Value, out path) == false)
+			if (HedConfiguration.Instance.TryGetPath(match.Groups[1].Value, out path) == false)
 			{
 				return new HedResponse
 				{
