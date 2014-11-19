@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CompressedStreamContent.cs" />
     <Compile Include="Controllers\TopologyController.cs" />
     <Compile Include="HedConfiguration.cs" />
     <Compile Include="HedProxyHandler.cs" />
@@ -84,7 +85,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="topology.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

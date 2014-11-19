@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,16 +33,34 @@ namespace Hed.ConsoleHost
 			return _topology.Paths.TryGetValue(value, out path);
 		}
 
-		public object Add(string src, string dest)
+        public string Set(string src, string dest, ProxyBehavior behavior = ProxyBehavior.Optimal)
 		{
-			var key = "1";
-			if (_topology.Paths.Count > 0)
-				key = (_topology.Paths.Keys.Select(int.Parse).Max() + 1).ToString(CultureInfo.InvariantCulture);
+            var destUri = new Uri(dest);
+            if (_topology.Paths.Count == 0)
+            {
+                _topology.Paths.Add("1", new ProxyPath
+                {
+                    Behavior = behavior,
+                    To =   destUri,
+                    From =  src
+                });
+                return "1";
+            }
+
+
+            var path = _topology.Paths.FirstOrDefault(x => x.Value.From == src && x.Value.To == destUri);
+            if (path.Value != null)
+            {
+                path.Value.Behavior = behavior;
+                return path.Key;
+            }
+
+            var key = (_topology.Paths.Keys.Select(int.Parse).Max() + 1).ToString(CultureInfo.InvariantCulture);
 			_topology.Paths.Add(key, new ProxyPath
 			{
-				Behavior = ProxyBehavior.Optimal,
+                Behavior = behavior,
 				From = src,
-				To = new Uri(dest)
+				To = destUri
 			});
 
 			return key;
@@ -52,9 +71,15 @@ namespace Hed.ConsoleHost
 			File.WriteAllText(config, JsonConvert.SerializeObject(_topology));
 		}
 
-		public void Delete(string id)
+		public void Delete(string src, string dest)
 		{
-			_topology.Paths.Remove(id);
+            var destUri = new Uri(dest);
+            var path = _topology.Paths.FirstOrDefault(x => x.Value.From == src && x.Value.To == destUri);
+            if (path.Value != null)
+            {
+                _topology.Paths.Remove(path.Key);
+            }
+
 		}
 
 		public void Set(string id, ProxyBehavior behavior)

@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hed studio</title>
+</head>
+<body>
+    <script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/knockout-3.2.0.js"></script>
+    <script type="text/javascript" src="Scripts/raphael-min.js"></script>
+    <script type="text/javascript" src="Scripts/dracula_graffle.js"></script>
+    <script type="text/javascript" src="Scripts/dracula_graph.js"></script>
+    <script type="text/javascript" src="App/Viewmodels/homeViewModel.js"></script>
+    <link rel="stylesheet" href="Content/app.css" />
+    <div id="homeViewModel">                    
+        <span>Vertex name:<input type="text" data-bind="value:newVertex"></span>
+        <input type="button" data-bind="click:addVertexUnique" value="New endpoint" />         
+        <span>From:<select data-bind="options:vertexes, selectedOptions:edgeFrom" ></select></span>
+        <span>To:  <select data-bind="options:vertexes, selectedOptions:edgeTo" ></select></span>
+        <span>Behavior:  <select data-bind="options:behaviors, selectedOptions:behavior"></select></span>
+        <input type="button" data-bind="click:addEdge" value="Set connection" />
+        <input type="button" data-bind="click:removeEdge" value="Remove connection" />
+        <div id="canvas"></div>
+    </div>
+    <script>
+        $(function () {
+            var vm = new homeViewModel();
+            ko.applyBindings(vm, document.getElementById('homeViewModel'));
+
+        });
+    </script>
+</body>
+
+</html>
