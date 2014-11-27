@@ -9,8 +9,8 @@ namespace Hed.ConsoleHost
 {
 	public class HedConfiguration
 	{
-		private readonly string config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "topology.json");
-		private readonly ProxyTopology _topology;
+		private  string config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "topology.json");
+		private  ProxyTopology _topology;
 
 		public static HedConfiguration Instance { get; private set; }
 		public ProxyTopology Topology { get { return _topology; }}
@@ -27,6 +27,12 @@ namespace Hed.ConsoleHost
 				_topology = JsonConvert.DeserializeObject<ProxyTopology>(File.ReadAllText(config));
 			}
 		}
+
+	    public void OverrideTopologyPath(string topoPath)
+	    {
+	        if (File.Exists(topoPath)) config = topoPath;
+            _topology = JsonConvert.DeserializeObject<ProxyTopology>(File.ReadAllText(config));
+	    }
 
 		public bool TryGetPath(string value, out ProxyPath path)
 		{

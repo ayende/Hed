@@ -103,7 +103,7 @@ namespace Hed.Server.Connection
 
             var writeStream = this.GetWriteStream();
 
-            await writeStream.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length).ConfigureAwait(false);
+            await writeStream.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length, ct).ConfigureAwait(false);
             Debug.WriteLine("{0}: Wrote headers ({1}b)", this.RemoteEndPoint, ms.Length);
 
             if (response.ResponseBody != null && response.ResponseBody.CanRead)
@@ -112,7 +112,7 @@ namespace Hed.Server.Connection
                 int read;
                 long written = 0;
 
-                while ((read = await response.ResponseBody.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
+                while ((read = await response.ResponseBody.ReadAsync(buffer, 0, buffer.Length, ct).ConfigureAwait(false)) > 0)
                 {
                     written += read;
                     Debug.WriteLine("{0}: Read {1:N0} bytes from response body", this.RemoteEndPoint, read);
@@ -124,7 +124,7 @@ namespace Hed.Server.Connection
 
             }
 
-            await writeStream.FlushAsync().ConfigureAwait(false);
+            await writeStream.FlushAsync(ct).ConfigureAwait(false);
         }
 
         public void Close()

@@ -12,13 +12,14 @@ namespace Hed.ConsoleHost
 	{
 		static void Main(string[] args)
 		{
-			Trace.Listeners.Add(new ConsoleLogger());
-			var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
-			var hedProxyHandler = new HedProxyHandler();
-			var server = new HedServer(endPoint, hedProxyHandler);
-			server.Start();
+            //Trace.Listeners.Add(new ConsoleLogger());
+            //var endPoint = new IPEndPoint(IPAddress.Loopback, 9090);
+            //var hedProxyHandler = HedProxyHandler.Instance;
+            //var server = new HedServer(endPoint, hedProxyHandler);
+            //server.Start();
 
-			using (WebApp.Start<Startup>("http://localhost:9091/"))
+            using (var simpleProxy = new SimpleProxy(9090))
+            //using (WebApp.Start<Startup>("http://localhost:9091/"))
 			{
 				Console.ReadLine();
 			}

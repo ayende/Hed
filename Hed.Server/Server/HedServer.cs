@@ -21,6 +21,7 @@ namespace Hed.Server.Server
         public HedServer(IPEndPoint listenEp, IHedRequestHandler handler)
         {
             this.server = new TcpListener(listenEp);
+            server.Server.NoDelay = true;
             this.handler = handler;
         }
 

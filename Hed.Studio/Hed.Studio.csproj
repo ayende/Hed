@@ -61,6 +61,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App\main.js" />
     <Content Include="packages.config" />
     <Content Include="Content\app.less" />
     <Content Include="Content\app.css.map">
@@ -88,24 +89,39 @@
     <Content Include="Scripts\dracula_algorithms.js" />
     <Content Include="Scripts\dracula_graffle.js" />
     <Content Include="Scripts\dracula_graph.js" />
+    <Content Include="Scripts\knockout.mapping-2.4.1.js" />
     <Content Include="Scripts\raphael-min.js" />
+    <Content Include="Scripts\require.js" />
     <Content Include="Scripts\seedrandom.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="App\Models\connection.ts" />
+    <TypeScriptCompile Include="App\Models\connectionStatistics.ts" />
+    <TypeScriptCompile Include="App\Models\requestStatistics.ts" />
+    <TypeScriptCompile Include="App\Models\topology.ts" />
     <TypeScriptCompile Include="App\Viewmodels\homeViewModel.ts" />
     <TypeScriptCompile Include="lib\Graph.ts" />
     <TypeScriptCompile Include="Scripts\knockout.d.ts" />
+    <TypeScriptCompile Include="Scripts\knockout.mapping.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\typings\knockout\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptModuleKind>amd</TypeScriptModuleKind>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />

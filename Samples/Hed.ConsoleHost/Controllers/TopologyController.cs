@@ -4,7 +4,9 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web;
 using System.Web.Http;
+using Microsoft.Web.WebSockets;
 using Raven.Client.Connection;
 
 namespace Hed.ConsoleHost.Controllers
@@ -15,7 +17,6 @@ namespace Hed.ConsoleHost.Controllers
         [Route("topology/view")]
         public object Get()
         {
-
             return HedConfiguration.Instance.Topology;
         }
 
@@ -131,5 +132,6 @@ namespace Hed.ConsoleHost.Controllers
                     return "text/plain";
             }
         }
+
     }
 }

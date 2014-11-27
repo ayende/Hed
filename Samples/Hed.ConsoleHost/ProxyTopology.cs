@@ -5,7 +5,9 @@
 // -----------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Hed.ConsoleHost
 {
@@ -19,7 +21,20 @@ namespace Hed.ConsoleHost
 		public string From;
 		public Uri To;
 		public ProxyBehavior Behavior;
+
+        public ConcurrentDictionary<string, Ref> Operations = new ConcurrentDictionary<string, Ref>(); 
+
+	    public void Operation(string name)
+	    {
+	        var r = Operations.GetOrAdd(name, s => new Ref());
+	        Interlocked.Increment(ref r.Value);
+	    }
 	}
+
+    public class Ref
+    {
+        public int Value;
+    }
 
 	public enum ProxyBehavior
 	{
