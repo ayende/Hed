@@ -60,6 +60,7 @@
     <Compile Include="Handlers\IHedRequestHandler.cs" />
     <Compile Include="Server\HedServer.cs" />
     <Compile Include="Utils\ChunkedStream.cs" />
+    <Compile Include="Utils\GoodChunkedStream.cs" />
     <Compile Include="Utils\HttpParser\HttpResponseParser.cs" />
     <Compile Include="Utils\HttpParser\IHttpResponseHandler.cs" />
     <Compile Include="Utils\MaxReadStream.cs" />

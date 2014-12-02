@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 using Microsoft.Web.WebSockets;
+using Newtonsoft.Json;
 using Raven.Client.Connection;
 
 namespace Hed.ConsoleHost.Controllers
@@ -19,7 +20,22 @@ namespace Hed.ConsoleHost.Controllers
         {
             return HedConfiguration.Instance.Topology;
         }
+        [HttpGet]
+        [Route("topology/getdatabases")]
+        public object GetDatabases(string url)
+        {
 
+            try
+            {
+                var res = DocumentStoreFactory.GetDocumentStoreForUrl(url).DatabaseCommands.GetDatabaseNames(32, 0);
+                return res;
+            }
+            catch (Exception)
+            {
+                return new string[]{};
+            }
+            
+        }        
         [HttpGet]
         [Route("topology/set")]
         public object Set(string from, string to, string behavior)
@@ -29,9 +45,10 @@ namespace Hed.ConsoleHost.Controllers
             ProxyBehavior parsedBehavior = string.IsNullOrEmpty(behavior)
                 ? ProxyBehavior.Optimal
                 : Enum.TryParse(behavior, out parsedBehavior) ? parsedBehavior : ProxyBehavior.Optimal;
-            HedConfiguration.Instance.Set(from, to, parsedBehavior);
+            bool pathInTopology;
+            HedConfiguration.Instance.Set(from, to, out pathInTopology, parsedBehavior);
             HedConfiguration.Instance.Flush();
-
+            if (!pathInTopology) ReplicationProxySetup.Instance.TrySetRelationship(from, to, parsedBehavior);
             return Redirect(new Uri("/topology/view", UriKind.Relative));
         }
 
@@ -54,9 +71,6 @@ namespace Hed.ConsoleHost.Controllers
 
         public HttpResponseMessage WriteEmbeddedFile(string docPath)
         {
-            /*var filePath = Path.Combine(ravenPath, docPath);
-            if (File.Exists(filePath))
-                return WriteFile(filePath);*/
             var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../Hed.Studio", docPath);
             if (File.Exists(filePath))
                 return WriteFile(filePath);
@@ -65,34 +79,11 @@ namespace Hed.ConsoleHost.Controllers
             if (File.Exists(filePath))
                 return WriteFile(filePath);
 
-
-            /*if (string.IsNullOrEmpty(zipPath) == false)
-            {
-                var fullZipPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, zipPath + ".zip");
-                if (File.Exists(fullZipPath) == false)
-                    fullZipPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", zipPath + ".zip");
-
-                if (File.Exists(fullZipPath))
-                {
-                    return WriteFileFromZip(fullZipPath, docPath);
-                }
-            }*/
-
             return null;
         }
 
         public HttpResponseMessage WriteFile(string filePath)
         {
-            /*var etagValue = GetHeader("If-None-Match") ?? GetHeader("If-Match");
-            if (etagValue != null)
-            {
-                // Bug fix: the etag header starts and ends with quotes, resulting in cache-busting; the Studio always receives new files, even if should be cached.
-                etagValue = etagValue.Trim(new[] { '\"' });
-            }
-
-            var fileEtag = File.GetLastWriteTimeUtc(filePath).ToString("G");
-            if (etagValue == fileEtag)
-                return GetEmptyMessage(HttpStatusCode.NotModified);*/
 
             var msg = new HttpResponseMessage
             {

@@ -1,4 +1,21 @@
 ﻿body {
-  background-color: white;
+  font: 300 14px 'Helvetica Neue', Helvetica;
+  color: darkblue;
+}
+.node rect {
+  stroke: #333;
+  fill: #fff;
+}
+.edgePath path {
+  stroke: #333;
+  fill: #333;
+  color: aqua;
+  stroke-width: 1.5px;
+}
+svg {
+  min-height: 500px;
+}
+.AddEndPointPresentor {
+  padding: 0.5cm 0.5cm 0.5cm 0.5cm;
 }
 /*# sourceMappingURL=app.css.map */
