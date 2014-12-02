@@ -261,4 +261,3 @@
     
     return homeViewModel;
 });
-//# sourceMappingURL=homeViewModel.js.map

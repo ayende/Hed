@@ -16,4 +16,3 @@
     
     return connection;
 });
-//# sourceMappingURL=connection.js.map
