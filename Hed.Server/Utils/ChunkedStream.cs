@@ -1,36 +1,146 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hed.Server.Utils
 {
-	public class ChunkedStream : Stream
+    public class ChunkedStream : Stream
     {
-        private Stream innerStream;
-        private bool inChunkHeader = true;
-        private int chunkHeaderPosition;
-        private bool inChunkHeaderLength = true;
-        private int chunkLength;
-        private int chunkRead;
-        private bool done;
-        private bool inChunkTrailingCrLf;
-        private int chunkTrailingCrLfPosition;
-        private bool inChunk;
-
-        private int chunkLeft { get { return chunkLength - chunkRead; } }
-
-        public override bool CanRead { get { return !this.done; } }
-        public override bool CanSeek { get { return false; } }
-        public override bool CanWrite { get { return false; } }
-
-        public ChunkedStream(Stream innerStream)
-        {
-            this.innerStream = innerStream;
-        }
+        private readonly Stream _stream;
 
         public override void Flush()
         {
+            throw new NotSupportedException();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        private const int _bufferSize = 16;
+        private readonly byte[] _internalBuffer = new byte[_bufferSize];
+        private int _posInBuffer = 0;
+
+        public ChunkedStream(Stream stream)
+        {
+            _stream = stream;
+        }
+
+        private bool _done;
+        private int _nextChunkLen = -1;
+        private int _nextHeaderLen = -1;
+        private int _byteRead = 0;
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            if (_done)
+                return 0;
+
+            int read;
+            if (_nextHeaderLen > 0)
+            {
+                read = Math.Min(count, _nextHeaderLen);
+                Buffer.BlockCopy(_internalBuffer, _posInBuffer, buffer, offset, read);
+                _nextHeaderLen -= read;
+                _posInBuffer += read;
+                return read;
+            }
+
+            if (_nextChunkLen > 0)
+            {
+                read = await _stream.ReadAsync(buffer, offset, Math.Min(_nextChunkLen, count),cancellationToken);
+                if (read == 0)
+                {
+                    _done = true;// also shouldn't happen
+                    return 0;
+                }
+                _nextChunkLen -= read;
+                return read;
+            }
+
+            read = await _stream.ReadAsync(_internalBuffer, _byteRead, _bufferSize - _byteRead, cancellationToken);
+            var actualRead = read + _byteRead; //we copied those bytes from before.
+            _byteRead = 0;
+            _posInBuffer = 0;
+            if (actualRead == 0)
+            {
+                _done = true;// actually shouldn't happen, but still
+                return 0;
+            }
+            var rnPos = -1;
+            for (int i = 1; i < actualRead - 1; i++)
+            {
+                if (_internalBuffer[i] == '\r' && _internalBuffer[i + 1] == '\n')
+                {
+                    rnPos = i;
+                    break;
+                }
+            }
+            if (rnPos == -1)
+                throw new FormatException("Can't understand the chunked encoding, no \\r\\n found");
+
+            var num = Encoding.UTF8.GetString(_internalBuffer, 0, rnPos);
+            var len = int.Parse(num, NumberStyles.HexNumber);
+            if (len == 0)
+            {
+                _done = true;
+                return 0;
+            }
+
+            var fullChunkHeaderSize = len + rnPos + 2 + 2;
+            if (fullChunkHeaderSize <= actualRead)
+            {
+                //_posInBuffer = read - (len + rnPos + 1);
+                _nextChunkLen = -1;
+                _nextHeaderLen = -1;
+                Buffer.BlockCopy(_internalBuffer, _posInBuffer, buffer, offset, fullChunkHeaderSize);
+                Buffer.BlockCopy(_internalBuffer, _posInBuffer + fullChunkHeaderSize, _internalBuffer, 0, actualRead - fullChunkHeaderSize);
+                _byteRead = actualRead - fullChunkHeaderSize;
+                return fullChunkHeaderSize;
+            }
+
+            _nextChunkLen = fullChunkHeaderSize - actualRead;
+
+            _nextHeaderLen = actualRead;
+            actualRead = Math.Min(count, _nextHeaderLen);
+            Buffer.BlockCopy(_internalBuffer, _posInBuffer, buffer, offset, actualRead);
+            _nextHeaderLen -= actualRead;
+            return actualRead;
+            
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return ReadAsync(buffer, offset, count).Result;
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return false; }
         }
 
         public override long Length
@@ -40,170 +150,8 @@ namespace Hed.Server.Utils
 
         public override long Position
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override int EndRead(IAsyncResult asyncResult)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            if (this.done)
-                return 0;
-
-            count = Math.Min(OptimizeCount(count), count);
-
-            int read = await this.innerStream.ReadAsync(buffer, offset, count, cancellationToken);
-
-            this.Execute(buffer, offset, read);
-
-            return read;
-        }
-
-        private int OptimizeCount(int count)
-        {
-            if (!inChunkHeader)
-            {
-                if (count > chunkLeft + 2)
-                    count = chunkLeft + 2;
-            }
-            else
-            {
-                if (chunkHeaderPosition == 0)
-                    count = 3;
-                else
-                {
-                    if (inChunkHeaderLength)
-                        count = 2;
-                    else
-                        count = chunkLength + 3;
-                }
-            }
-            return count;
-        }
-
-        private void Execute(byte[] buffer, int offset, int count)
-        {
-            for (int i = offset; i < offset + count; i++)
-            {
-                if (this.done)
-                    break;
-
-                byte b = buffer[i];
-
-                if (this.inChunkHeader)
-                {
-                    for (; i < offset + count; i++)
-                    {
-                        b = buffer[i];
-
-                        if (this.inChunkHeaderLength)
-                        {
-                            if (b == 13)
-                                this.inChunkHeaderLength = false;
-                            else
-                                this.chunkLength = (this.chunkLength << 4) + FromHex(b);
-                            
-                            this.chunkHeaderPosition++;
-                        }
-                        else
-                        {
-                            if (b != 10)
-                                throw new FormatException("Malformed chunk header");
-
-                            this.inChunkHeader = false;
-                            this.inChunk = true;
-                            this.chunkHeaderPosition = 0;
-
-                            break;
-                        }
-                    }
-                }
-                else if (this.inChunkTrailingCrLf)
-                {
-                    if (this.chunkTrailingCrLfPosition == 0 && b != 13 || this.chunkTrailingCrLfPosition == 1 && b != 10)
-                        throw new FormatException("Malformed chunk header");
-
-                    if (this.chunkTrailingCrLfPosition == 1)
-                    {
-                        this.inChunkTrailingCrLf = false;
-                        this.chunkTrailingCrLfPosition = 0;
-
-                        this.inChunkHeader = true;
-                        this.inChunkHeaderLength = true;
-
-                        if (chunkLength == 0)
-                            this.done = true;
-
-                        this.chunkLength = 0;
-                    }
-                    else
-                    {
-                        this.chunkTrailingCrLfPosition++;
-                    }
-
-                }
-                else if (this.inChunk)
-                {
-                    for (; i < offset + count; i++)
-                    {
-                        this.chunkRead++;
-
-                        if (chunkRead == this.chunkLength)
-                        {
-                            this.inChunk = false;
-                            this.inChunkTrailingCrLf = true;
-                            this.chunkRead = 0;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        private int FromHex(byte b)
-        {
-            // 0-9
-            if (b >= 48 && b <= 57)
-                return b - 48;
-
-            // A-F
-            if (b >= 65 && b <= 70)
-                return 10 + (b - 65);
-
-            // a-f
-            if (b >= 97 && b <= 102)
-                return 10 + (b - 97);
-
-            throw new FormatException("Not hex");
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void SetLength(long value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
+            get { throw new NotSupportedException(); }
+            set { throw new NotSupportedException(); }
         }
     }
 }

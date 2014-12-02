@@ -39,9 +39,10 @@ namespace Hed.ConsoleHost
 			return _topology.Paths.TryGetValue(value, out path);
 		}
 
-        public string Set(string src, string dest, ProxyBehavior behavior = ProxyBehavior.Optimal)
+        public string Set(string src, string dest,out bool inTopology, ProxyBehavior behavior = ProxyBehavior.Optimal)
 		{
             var destUri = new Uri(dest);
+            inTopology = false;
             if (_topology.Paths.Count == 0)
             {
                 _topology.Paths.Add("1", new ProxyPath
@@ -58,6 +59,7 @@ namespace Hed.ConsoleHost
             if (path.Value != null)
             {
                 path.Value.Behavior = behavior;
+                inTopology = true;
                 return path.Key;
             }
 

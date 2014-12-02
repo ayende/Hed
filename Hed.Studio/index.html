@@ -7,33 +7,19 @@
     <script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="Scripts/knockout-3.2.0.js"></script>
     <script type="text/javascript" src="Scripts/knockout.mapping-2.4.1.js"></script>
-    <script type="text/javascript" src="Scripts/raphael-min.js"></script>
-    <script type="text/javascript" src="Scripts/dracula_graffle.js"></script>
-    <script type="text/javascript" src="Scripts/dracula_graph.js"></script>
-    <!--<script type="text/javascript" src="App/Viewmodels/homeViewModel.js"></script>-->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cpettitt.github.io/project/dagre-d3/latest/demo/demo.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.js"></script>
     <script type="text/javascript" src="Scripts/require.js" data-main="App/main"></script>
     <link rel="stylesheet" href="Content/app.css" />
-    <div id="homeViewModel">
-        <span>Host name:<input type="text" data-bind="value:hostName"></span>
-        <span>Database name:<input type="text" data-bind="value:databaseName"></span>
-        <input type="button" data-bind="click:addDatabaseOnClick" value="Add database" />
-        <br />
-        <span>From:<select data-bind="options:databases, selectedOptions:dbFrom"></select></span>
-        <span>To:  <select data-bind="options:databases, selectedOptions:dbTo"></select></span>
-        <input type="button" data-bind="click:addRelationship" value="Set relationship" />
-        <br/>
-        <span>Endpoint name:<input type="text" data-bind="value:newVertex"></span>
-        <input type="button" data-bind="click:addEndPointOnClick" value="New endpoint" />
-        <br />
-        <span>From:<select data-bind="options:vertexes, selectedOptions:edgeFrom,event:{ change: endPointChanged}"></select></span>
-        <span>To:  <select data-bind="options:vertexes, selectedOptions:edgeTo,event:{ change: endPointChanged}"></select></span>
-        <span>Behavior:  <select data-bind="options:behaviors, selectedOptions:behavior"></select></span>
-        <input type="button" data-bind="click:addEdge" value="Set connection" />
-        <input type="button" data-bind="click:removeEdge" value="Remove connection" />
-        <div id="canvas"></div>
+    <div id="homeViewModel" data-bind="event: {keydown: OnKeyDown, keyup: OnKeyUp }">
+
+        <svg width=960 height=960><g id="topoGraph" /></svg>
         <table cellpadding="10">
             <thead>
                 <tr>
+                    <th>Key</th>
                     <th>Path</th>
                     <!-- ko foreach: actualBehaviors -->
                     <th data-bind="text: $data"></th>
@@ -41,7 +27,8 @@
                 </tr>
             </thead>
             <tbody data-bind="foreach:operations">
-                <td data-bind="text: key"></td>
+                <td data-bind="text: Key"></td>
+                <td data-bind="text: Path"></td>
                 <td data-bind="text: Behavior_503"></td>
                 <td data-bind="text: Behavior_CloseTsp"></td>
                 <td data-bind="text: Behavior_Optimal"></td>
@@ -51,20 +38,18 @@
                 <td data-bind="text: Behavior_HalfSend"></td>
             </tbody>
         </table>
+        <div>
+            <span>Host name:<input type="text" data-bind="value:hostName"></span>
+            <span>Database name:<input type="text" data-bind="value:databaseName"></span>
+            <input type="button" data-bind="click:addEndPointOnClick" value="Add Endpoint" />
+        </div>
+        <br />
+        <div >
+            <span>Behavior:  <select data-bind="options:behaviors, selectedOptions:behavior"></select></span>
+        </div>
     </div>
-    <!-- <table id="requests">
-         <thead>
-             <tr><th>Path</th><th>Optimal</th><th>Normal</th><th>Slow</th><th>Hiccup</th><th>Dropping</th><th>Down</th></tr>
-         </thead>
-         <tbody >
-             <tr>
-             </tr>
-         </tbody>
-     </table>-->
     <script>
         $(function () {
-
-
         });
     </script>
 </body>

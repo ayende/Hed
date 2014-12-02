@@ -10,7 +10,7 @@ namespace Hed.ConsoleHost
 {
     public class DocumentStoreFactory
     {
-        public static IDocumentStore GetDocumentStoreForUrl(string host, string database)
+        public static IDocumentStore GetDocumentStoreForUrl(string host, string database = "")
         {
                 var documentStore = new DocumentStore { Url = host, DefaultDatabase = database };
                 return documentStore.Initialize();
