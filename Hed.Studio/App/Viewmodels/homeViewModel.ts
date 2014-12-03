@@ -7,7 +7,7 @@ import connection = require("Models/connection");
 class homeViewModel {  
     behavior = ko.observable(["Optimal"]);
     behaviors = ko.observableArray<string>(["Optimal", "Normal", "Slow", "Hiccups", "Dropping", "Down"]);
-    actualBehaviors = ko.observableArray<string>(["503", "CloseTsp", "Optimal", "Slow", "Drop", "Repeated", "HalfSend"]);
+    actualBehaviors = ko.observableArray<string>(["503", "CloseTcp", "Optimal", "Slow", "Drop", "Repeated", "HalfSend"]);
     hostName = ko.observable("");
     databaseName = ko.observable("");
     databases = ko.observableArray<string>();
@@ -79,7 +79,7 @@ class homeViewModel {
             var pathOperation = {
                 Key: pathId,
                 Path: path, Behavior_503: pathProp.hasOwnProperty("503") ? pathProp["503"]["Value"] : 0
-                , Behavior_CloseTsp: pathProp.hasOwnProperty("CloseTsp") ? pathProp["CloseTsp"]["Value"] : 0
+                , Behavior_CloseTsp: pathProp.hasOwnProperty("CloseTcp") ? pathProp["CloseTcp"]["Value"] : 0
                 , Behavior_Optimal: pathProp.hasOwnProperty("Optimal") ? pathProp["Optimal"]["Value"] : 0
                 , Behavior_Slow: pathProp.hasOwnProperty("Slow") ? pathProp["Slow"]["Value"] : 0 
                 , Behavior_Drop: pathProp.hasOwnProperty("Drop") ? pathProp["Drop"]["Value"] : 0
