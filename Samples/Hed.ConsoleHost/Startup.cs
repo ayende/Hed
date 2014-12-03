@@ -42,7 +42,7 @@ namespace Hed.ConsoleHost
 			config.Formatters.JsonFormatter.SerializerSettings.Converters
 				.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 			appBuilder.UseWebApi(config);
-		    appBuilder.Use(UpgradeToWebSockets);
+		    appBuilder.Use(UpgradeToWebSockets);           
 		}
         private Task UpgradeToWebSockets(IOwinContext context, Func<Task> next)
         {

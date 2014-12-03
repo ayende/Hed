@@ -14,8 +14,14 @@
 }
 svg {
   min-height: 500px;
+  min-width: 500px;
+  max-height: 1000px;
+  max-width: 1000px;
 }
-.AddEndPointPresentor {
-  padding: 0.5cm 0.5cm 0.5cm 0.5cm;
+g {
+  min-height: 500px;
+  min-width: 500px;
+  max-height: 1000px;
+  max-width: 1000px;
 }
 /*# sourceMappingURL=app.css.map */

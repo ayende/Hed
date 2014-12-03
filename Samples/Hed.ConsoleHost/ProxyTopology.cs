@@ -14,6 +14,7 @@ namespace Hed.ConsoleHost
 	public class ProxyTopology
 	{
 		public Dictionary<string,ProxyPath>  Paths = new Dictionary<string, ProxyPath>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<String> Endpoints = new HashSet<String>(); 
 	}
 
 	public class ProxyPath

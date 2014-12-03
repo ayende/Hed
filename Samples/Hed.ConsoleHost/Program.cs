@@ -17,8 +17,6 @@ namespace Hed.ConsoleHost
             var hedProxyHandler = HedProxyHandler.Instance;
             var server = new HedServer(endPoint, hedProxyHandler);
             server.Start();
-
-            //using (var simpleProxy = new SimpleProxy(9090))
             using (WebApp.Start<Startup>("http://localhost:9091/"))
 			{
 				Console.ReadLine();

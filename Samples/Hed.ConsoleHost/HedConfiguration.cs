@@ -39,10 +39,20 @@ namespace Hed.ConsoleHost
 			return _topology.Paths.TryGetValue(value, out path);
 		}
 
+	    public void AddEndpoint(String Endpoint)
+	    {
+	        _topology.Endpoints.Add(Endpoint);
+	    }
+        public void AddEndpoints(IEnumerable<String> Endpoints)
+        {
+            _topology.Endpoints.UnionWith(Endpoints);
+        }
         public string Set(string src, string dest,out bool inTopology, ProxyBehavior behavior = ProxyBehavior.Optimal)
 		{
             var destUri = new Uri(dest);
             inTopology = false;
+            AddEndpoint(src);
+            AddEndpoint(dest);
             if (_topology.Paths.Count == 0)
             {
                 _topology.Paths.Add("1", new ProxyPath

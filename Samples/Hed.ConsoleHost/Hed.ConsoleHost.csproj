@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Common\CompressedStreamContent.cs" />
     <Compile Include="Common\RequestSummary.cs" />
+    <Compile Include="Controllers\StudioController.cs" />
     <Compile Include="Controllers\TopologyController.cs" />
     <Compile Include="DocumentStoreFactory.cs" />
     <Compile Include="HedConfiguration.cs" />
