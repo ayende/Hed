@@ -4,7 +4,7 @@
             var _this = this;
             this.behavior = ko.observable(["Optimal"]);
             this.behaviors = ko.observableArray(["Optimal", "Normal", "Slow", "Hiccups", "Dropping", "Down"]);
-            this.actualBehaviors = ko.observableArray(["503", "CloseTsp", "Optimal", "Slow", "Drop", "Repeated", "HalfSend"]);
+            this.actualBehaviors = ko.observableArray(["503", "CloseTcp", "Optimal", "Slow", "Drop", "Repeated", "HalfSend"]);
             this.hostName = ko.observable("");
             this.databaseName = ko.observable("");
             this.databases = ko.observableArray();
@@ -75,7 +75,7 @@
                 var pathOperation = {
                     Key: pathId,
                     Path: path, Behavior_503: pathProp.hasOwnProperty("503") ? pathProp["503"]["Value"] : 0,
-                    Behavior_CloseTsp: pathProp.hasOwnProperty("CloseTsp") ? pathProp["CloseTsp"]["Value"] : 0,
+                    Behavior_CloseTsp: pathProp.hasOwnProperty("CloseTcp") ? pathProp["CloseTcp"]["Value"] : 0,
                     Behavior_Optimal: pathProp.hasOwnProperty("Optimal") ? pathProp["Optimal"]["Value"] : 0,
                     Behavior_Slow: pathProp.hasOwnProperty("Slow") ? pathProp["Slow"]["Value"] : 0,
                     Behavior_Drop: pathProp.hasOwnProperty("Drop") ? pathProp["Drop"]["Value"] : 0,
@@ -261,3 +261,4 @@
     
     return homeViewModel;
 });
+//# sourceMappingURL=homeViewModel.js.map
