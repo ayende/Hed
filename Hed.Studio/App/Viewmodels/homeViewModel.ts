@@ -33,7 +33,7 @@ class homeViewModel {
         $.ajax("/topology/view", "GET").done(x => {
             this.createGraph();            
             this.generateNewGraphFromTopo(x, false);
-            this.websocket = new WebSocket("ws://localhost:9091/");
+            this.websocket = new WebSocket("ws://localhost:9091/websocket");
             this.websocket.onmessage = (event) => this.generateRequestStatistic(event.data);
             this.websocket.onclose = () => { };
             window.onbeforeunload = this.dispose;
@@ -41,18 +41,23 @@ class homeViewModel {
     }
     addEndPointOnClick() {
         if (typeof this.databaseName() === 'undefined' || this.databaseName() === "") {
-            $.ajax("/topology/getdatabases?" + "&url=" + encodeURIComponent(this.hostName()), "GET").done(x => {
-                for (var db in x) {
-                    this.pushDatabaseUnique(x[db]);
-                }
+            $.ajax("/topology/addEndpoints?" + "&url=" + encodeURIComponent(this.hostName()), "GET").done(x => {
+                this.generateNewGraphFromTopo(x, true);
             });
         } else {
-            this.pushDatabaseUnique(this.databaseName());
+            var dbFullName = this.hostName() + "/databases/" + this.databaseName();
+            $.ajax("/topology/addEndpoint?" + "&url=" + encodeURIComponent(dbFullName), "GET").done(x => {
+                this.generateNewGraphFromTopo(x, true);
+            });
         }
         this.redraw();
     }
-
-    pushDatabaseUnique(dbName) {
+    removeNodeFromTopology(toRemoveNode) {
+        $.ajax("/topology/removeEndpoint?" + "&url=" + encodeURIComponent(toRemoveNode), "GET").done(x => {
+            this.generateNewGraphFromTopo(x, true);
+        });
+    }
+/*    pushDatabaseUnique(dbName) {
         var dbFullName = this.hostName() + "/databases/" + dbName;
         var match = ko.utils.arrayFirst(this.databases(), function (item) {
             return dbFullName === item;
@@ -62,7 +67,7 @@ class homeViewModel {
             this.g.setNode(dbFullName, { label: "Host: " + this.hostName() + ", Database: " + dbName, width: 250, height: 65 });
             this.redraw();
         }
-    }
+    }*/
 
     generateRequestStatistic(dataAsJson) {
         this.operationsJson = ko.mapping.fromJSON(dataAsJson);
@@ -79,7 +84,7 @@ class homeViewModel {
             var pathOperation = {
                 Key: pathId,
                 Path: path, Behavior_503: pathProp.hasOwnProperty("503") ? pathProp["503"]["Value"] : 0
-                , Behavior_CloseTsp: pathProp.hasOwnProperty("CloseTcp") ? pathProp["CloseTcp"]["Value"] : 0
+                , Behavior_CloseTcp: pathProp.hasOwnProperty("CloseTcp") ? pathProp["CloseTcp"]["Value"] : 0
                 , Behavior_Optimal: pathProp.hasOwnProperty("Optimal") ? pathProp["Optimal"]["Value"] : 0
                 , Behavior_Slow: pathProp.hasOwnProperty("Slow") ? pathProp["Slow"]["Value"] : 0 
                 , Behavior_Drop: pathProp.hasOwnProperty("Drop") ? pathProp["Drop"]["Value"] : 0
@@ -124,16 +129,21 @@ class homeViewModel {
             var path = topo.Paths[key];
             var fromSplit = path.From.split("/databases/");    
             var toSplit = path.To.split("/databases/"); 
-            this.g.setNode(path.From, { label: "Host: " + fromSplit[0]+", Database: " + fromSplit[1], width: 250, height: 65 });
-            this.g.setNode(path.To, { label: "Host: " + toSplit[0] + ", Database: " + toSplit[1], width: 250, height: 65 });
+            this.g.setNode(path.From, { label: "Host: " + fromSplit[0]+"\n Database: " + fromSplit[1], width: 250, height: 65 });
+            this.g.setNode(path.To, { label: "Host: " + toSplit[0] + "\n Database: " + toSplit[1], width: 250, height: 65 });
             var behaviorColor = this.getColorFromBehavior(path.Behavior);
             this.currentTopo().paths.push(new connection(key, path.From, path.To, path.Behavior));
             this.g.setEdge(path.From, path.To, {
                 label: path.Behavior,
                 labelStyle: "fill: " + behaviorColor
             });
-            this.databases().push(path.From);
-            this.databases().push(path.To);
+            //this.databases().push(path.From);
+            //this.databases().push(path.To);
+        }
+        for (var key in topo.Endpoints) {
+            var endpoint = topo.Endpoints[key];
+            var endpointSplit = endpoint.split("/databases/");
+            this.g.setNode(endpoint, { label: "Host: " + endpointSplit[0] + "\n Database: " + endpointSplit[1], width: 250, height: 65 });
         }
         this.redraw();
     }
@@ -166,7 +176,7 @@ class homeViewModel {
     flushGraph() {
         delete this.g;
         this.createGraph();
-        this.databases.removeAll();
+        //this.databases.removeAll();
     }
 
     addEdgeCore(from, to, behavior) {
@@ -192,24 +202,27 @@ class homeViewModel {
             inner = svg.select("g");
         this.svg = svg;
         this.inner = inner;
-
-        // Set up zoom support
-        var zoom = d3.behavior.zoom().on("zoom", function () {
-            inner.attr("transform", "translate(" + d3.event.translate + ")" +
-                "scale(" + d3.event.scale + ")");
-        });
-        this.zoom = zoom;
-        this.svg.call(zoom);
+        if (this.g.nodeCount() !== 0) {
+            // Set up zoom support
+            var zoom = d3.behavior.zoom().on("zoom", function() {
+                inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                    "scale(" + d3.event.scale + ")");
+            });
+            this.zoom = zoom;
+            this.svg.call(zoom);
+        }
         this.renderer(this.inner, this.g);
-        // Center the graph
-        var initialScale = 0.75;
-        this.zoom
-            .translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20])
-            .scale(initialScale)
-            .event(this.svg);
-        this.svg.attr('height', this.g.graph().height * initialScale + 40);
-        inner.selectAll("g.node")
-            .attr('onclick', n => 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");');
+        if (this.g.nodeCount() !== 0) {
+            // Center the graph
+            var initialScale = 0.75;
+            this.zoom
+                .translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20])
+                .scale(initialScale)
+                .event(this.svg);
+            this.svg.attr('height', this.g.graph().height * initialScale + 40);
+            inner.selectAll("g.node")
+                .attr('onclick', n => 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");');
+        }
     }
 
     OnKeyDown(event) {
@@ -231,7 +244,8 @@ class homeViewModel {
             if (this.selectedNode() === "") {
                 this.selectedNode(n)
             } else {
-                this.addEdgeCore(this.selectedNode(), n,this.behavior()[0]);
+                if (this.selectedNode() === n) this.removeNodeFromTopology(n);
+                else this.addEdgeCore(this.selectedNode(), n,this.behavior()[0]);
                 this.selectedNode("");
             }
         } else if (this.shiftKeyPressed) {

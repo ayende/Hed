@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,22 +21,39 @@ namespace Hed.ConsoleHost.Controllers
         {
             return HedConfiguration.Instance.Topology;
         }
-        [HttpGet]
-        [Route("topology/getdatabases")]
-        public object GetDatabases(string url)
-        {
 
+        [HttpGet]
+        [Route("topology/addEndpoints")]
+        public object AddEndpoints(string url)
+        {
             try
             {
                 var res = DocumentStoreFactory.GetDocumentStoreForUrl(url).DatabaseCommands.GetDatabaseNames(32, 0);
-                return res;
+                HedConfiguration.Instance.AddEndpoints(res.Select(dbname => url + "/databases/" + dbname));
+                return Redirect(new Uri("/topology/view", UriKind.Relative));
             }
             catch (Exception)
             {
-                return new string[]{};
+                return Redirect(new Uri("/topology/view", UriKind.Relative));
             }
             
-        }        
+        }
+
+        [HttpGet]
+        [Route("topology/addEndpoint")]
+        public object AddEndpoint(string url)
+        {
+            HedConfiguration.Instance.AddEndpoint(url);
+            return Redirect(new Uri("/topology/view", UriKind.Relative));
+        }
+
+        [HttpGet]
+        [Route("topology/removeEndpoint")]
+        public object RemoveEndpoint(string url)
+        {
+            HedConfiguration.Instance.RemoveEndpoint(url);
+            return Redirect(new Uri("/topology/view", UriKind.Relative));
+        }
         [HttpGet]
         [Route("topology/set")]
         public object Set(string from, string to, string behavior)
@@ -48,7 +66,7 @@ namespace Hed.ConsoleHost.Controllers
             bool pathInTopology;
             HedConfiguration.Instance.Set(from, to, out pathInTopology, parsedBehavior);
             HedConfiguration.Instance.Flush();
-            if (!pathInTopology) ReplicationProxySetup.Instance.TrySetRelationship(from, to, parsedBehavior);
+            if (!pathInTopology) ReplicationProxySetup.Instance.TrySetReplication(from, to, parsedBehavior);
             return Redirect(new Uri("/topology/view", UriKind.Relative));
         }
 
@@ -56,73 +74,16 @@ namespace Hed.ConsoleHost.Controllers
         [Route("topology/del")]
         public object Del(string from, string to)
         {
-            HedConfiguration.Instance.Delete(from, to);
+            var key = HedConfiguration.Instance.Delete(from, to);
             HedConfiguration.Instance.Flush();
+            if (!key.Equals("-1"))
+            {
+                ReplicationProxySetup.Instance.TryRemoveReplication(key);
+            }
             return Redirect(new Uri("/topology/view", UriKind.Relative));
         }
 
-        [HttpGet]
-        [Route("studio")]
-        [Route("studio/{*path}")]
-        public HttpResponseMessage GetStudioFile(string path = null)
-        {
-            return WriteEmbeddedFile(path);
-        }
-
-        public HttpResponseMessage WriteEmbeddedFile(string docPath)
-        {
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../Hed.Studio", docPath);
-            if (File.Exists(filePath))
-                return WriteFile(filePath);
-
-            filePath = Path.Combine("~/../../../../../Hed.Studio", docPath);
-            if (File.Exists(filePath))
-                return WriteFile(filePath);
-
-            return null;
-        }
-
-        public HttpResponseMessage WriteFile(string filePath)
-        {
-
-            var msg = new HttpResponseMessage
-            {
-                Content = new CompressedStreamContent(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), false)
-            };
-
-            // WriteETag(fileEtag, msg);
-
-            var type = GetContentType(filePath);
-            msg.Content.Headers.ContentType = new MediaTypeHeaderValue(type);
-
-            return msg;
-        }
-
-        private static string GetContentType(string docPath)
-        {
-            switch (Path.GetExtension(docPath))
-            {
-                case ".html":
-                case ".htm":
-                    return "text/html";
-                case ".css":
-                    return "text/css";
-                case ".js":
-                    return "text/javascript";
-                case ".ico":
-                    return "image/vnd.microsoft.icon";
-                case ".jpg":
-                    return "image/jpeg";
-                case ".gif":
-                    return "image/gif";
-                case ".png":
-                    return "image/png";
-                case ".xap":
-                    return "application/x-silverlight-2";
-                default:
-                    return "text/plain";
-            }
-        }
+ 
 
     }
 }
