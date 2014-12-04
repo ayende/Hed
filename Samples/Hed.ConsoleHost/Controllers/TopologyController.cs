@@ -48,6 +48,13 @@ namespace Hed.ConsoleHost.Controllers
         }
 
         [HttpGet]
+        [Route("topology/removeEndpoint")]
+        public object RemoveEndpoint(string url)
+        {
+            HedConfiguration.Instance.RemoveEndpoint(url);
+            return Redirect(new Uri("/topology/view", UriKind.Relative));
+        }
+        [HttpGet]
         [Route("topology/set")]
         public object Set(string from, string to, string behavior)
         {
@@ -59,7 +66,7 @@ namespace Hed.ConsoleHost.Controllers
             bool pathInTopology;
             HedConfiguration.Instance.Set(from, to, out pathInTopology, parsedBehavior);
             HedConfiguration.Instance.Flush();
-            if (!pathInTopology) ReplicationProxySetup.Instance.TrySetRelationship(from, to, parsedBehavior);
+            if (!pathInTopology) ReplicationProxySetup.Instance.TrySetReplication(from, to, parsedBehavior);
             return Redirect(new Uri("/topology/view", UriKind.Relative));
         }
 
@@ -67,8 +74,12 @@ namespace Hed.ConsoleHost.Controllers
         [Route("topology/del")]
         public object Del(string from, string to)
         {
-            HedConfiguration.Instance.Delete(from, to);
+            var key = HedConfiguration.Instance.Delete(from, to);
             HedConfiguration.Instance.Flush();
+            if (!key.Equals("-1"))
+            {
+                ReplicationProxySetup.Instance.TryRemoveReplication(key);
+            }
             return Redirect(new Uri("/topology/view", UriKind.Relative));
         }
 

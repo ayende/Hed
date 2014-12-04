@@ -51,8 +51,26 @@ namespace Hed.ConsoleHost
                 }
             }
         }
-
-        public bool TrySetRelationship(string dbFrom, string dbTo,ProxyBehavior parsedBehavior)
+        private void RemoveReplication(String fromHost, String fromDb, string key)
+        {
+            using (var documentStore = DocumentStoreFactory.GetDocumentStoreForUrl(fromHost, fromDb))
+            {
+                using (var session = documentStore.OpenSession())
+                {
+                    var replicateDoc = session.Load<ReplicationDocument>(ReplicationDocKey);
+                    if (null == replicateDoc) return;
+                    var destination = (from dest in replicateDoc.Destinations
+                        where dest.Url.Equals(string.Format("{0}/{1}", RedirectPrefix, key))
+                        select dest).FirstOrDefault();
+                    if (destination == null) return;
+                    replicateDoc.Destinations.Remove(destination);
+                    var doc = RavenJObject.FromObject(replicateDoc);
+                    doc.Remove("Id");
+                    documentStore.DatabaseCommands.Put(ReplicationDocKey, null, doc, new RavenJObject());
+                }
+            }
+        }
+        public bool TrySetReplication(string dbFrom, string dbTo,ProxyBehavior parsedBehavior)
         {
             string dbFromHost, dbFromDb, dbToHost, dbToDb;
             SplitDatabasesPathFromTo(dbFrom, dbTo, out dbFromHost, out dbFromDb, out dbToHost, out dbToDb);
@@ -60,6 +78,20 @@ namespace Hed.ConsoleHost
             if (CheckIfRealDatabase(dbFromHost, dbFromDb) && CheckIfRealDatabase(dbToHost, dbToDb))
             {
                 FetchPathsAndRedirectReplication(dbFromHost, dbFromDb, dbToHost, dbToDb, parsedBehavior);
+                return true;
+            }
+            return false;
+        }
+        public bool TryRemoveReplication(string key)
+        {
+            if (!HedConfiguration.Instance.Topology.Paths.ContainsKey(key)) return false;
+            var dbFrom = HedConfiguration.Instance.Topology.Paths[key].From;
+            var splitedFrom = SplitDatabasePathToHostAndName(dbFrom);
+            var dbFromHost = splitedFrom.Item1;
+            var dbFromDb = splitedFrom.Item2;
+            if (CheckIfRealDatabase(dbFromHost, dbFromDb))
+            {
+                RemoveReplication(dbFromHost, dbFromDb, key);
                 return true;
             }
             return false;
@@ -110,7 +142,7 @@ namespace Hed.ConsoleHost
         private const string ReplicationDocKey = "Raven/Replication/Destinations";
         private String[] databasesUrls;
         private Dictionary<String, ProxyPath> paths = new Dictionary<string, ProxyPath>(StringComparer.OrdinalIgnoreCase);       
-        private readonly string RedirectPrefix = "http://localhost.:9090";
+        private readonly string RedirectPrefix = "http://localhost.fiddler:9090";
 
 
     }

@@ -43,6 +43,16 @@ namespace Hed.ConsoleHost
 	    {
 	        _topology.Endpoints.Add(Endpoint);
 	    }
+        public void RemoveEndpoint(String Endpoint)
+        {
+            _topology.Endpoints.Remove(Endpoint);
+            var removeList = _topology.Paths.Where(x => x.Value.From.Equals(Endpoint) || x.Value.To.Equals(Endpoint)).Select(x=>x.Key).ToList();
+            foreach (var pathKey in removeList)
+            {
+                ReplicationProxySetup.Instance.TryRemoveReplication(pathKey);
+                _topology.Paths.Remove(pathKey);
+            }
+        }
         public void AddEndpoints(IEnumerable<String> Endpoints)
         {
             _topology.Endpoints.UnionWith(Endpoints);
@@ -89,15 +99,16 @@ namespace Hed.ConsoleHost
 			File.WriteAllText(config, JsonConvert.SerializeObject(_topology));
 		}
 
-		public void Delete(string src, string dest)
+		public string Delete(string src, string dest)
 		{
             var destUri = new Uri(dest);
             var path = _topology.Paths.FirstOrDefault(x => x.Value.From == src && x.Value.To == destUri);
             if (path.Value != null)
             {
                 _topology.Paths.Remove(path.Key);
+                return path.Key;
             }
-
+		    return "-1";
 		}
 
 		public void Set(string id, ProxyBehavior behavior)

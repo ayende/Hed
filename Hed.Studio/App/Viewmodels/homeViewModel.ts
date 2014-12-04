@@ -33,7 +33,7 @@ class homeViewModel {
         $.ajax("/topology/view", "GET").done(x => {
             this.createGraph();            
             this.generateNewGraphFromTopo(x, false);
-            this.websocket = new WebSocket("ws://localhost:9091/");
+            this.websocket = new WebSocket("ws://localhost:9091/websocket");
             this.websocket.onmessage = (event) => this.generateRequestStatistic(event.data);
             this.websocket.onclose = () => { };
             window.onbeforeunload = this.dispose;
@@ -52,7 +52,11 @@ class homeViewModel {
         }
         this.redraw();
     }
-
+    removeNodeFromTopology(toRemoveNode) {
+        $.ajax("/topology/removeEndpoint?" + "&url=" + encodeURIComponent(toRemoveNode), "GET").done(x => {
+            this.generateNewGraphFromTopo(x, true);
+        });
+    }
 /*    pushDatabaseUnique(dbName) {
         var dbFullName = this.hostName() + "/databases/" + dbName;
         var match = ko.utils.arrayFirst(this.databases(), function (item) {
@@ -198,24 +202,27 @@ class homeViewModel {
             inner = svg.select("g");
         this.svg = svg;
         this.inner = inner;
-
-        // Set up zoom support
-        var zoom = d3.behavior.zoom().on("zoom", function () {
-            inner.attr("transform", "translate(" + d3.event.translate + ")" +
-                "scale(" + d3.event.scale + ")");
-        });
-        this.zoom = zoom;
-        this.svg.call(zoom);
+        if (this.g.nodeCount() !== 0) {
+            // Set up zoom support
+            var zoom = d3.behavior.zoom().on("zoom", function() {
+                inner.attr("transform", "translate(" + d3.event.translate + ")" +
+                    "scale(" + d3.event.scale + ")");
+            });
+            this.zoom = zoom;
+            this.svg.call(zoom);
+        }
         this.renderer(this.inner, this.g);
-        // Center the graph
-        var initialScale = 0.75;
-        this.zoom
-            .translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20])
-            .scale(initialScale)
-            .event(this.svg);
-        this.svg.attr('height', this.g.graph().height * initialScale + 40);
-        inner.selectAll("g.node")
-            .attr('onclick', n => 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");');
+        if (this.g.nodeCount() !== 0) {
+            // Center the graph
+            var initialScale = 0.75;
+            this.zoom
+                .translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20])
+                .scale(initialScale)
+                .event(this.svg);
+            this.svg.attr('height', this.g.graph().height * initialScale + 40);
+            inner.selectAll("g.node")
+                .attr('onclick', n => 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");');
+        }
     }
 
     OnKeyDown(event) {
@@ -237,7 +244,8 @@ class homeViewModel {
             if (this.selectedNode() === "") {
                 this.selectedNode(n)
             } else {
-                this.addEdgeCore(this.selectedNode(), n,this.behavior()[0]);
+                if (this.selectedNode() === n) this.removeNodeFromTopology(n);
+                else this.addEdgeCore(this.selectedNode(), n,this.behavior()[0]);
                 this.selectedNode("");
             }
         } else if (this.shiftKeyPressed) {

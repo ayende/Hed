@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="Content/app.css" />
     <div id="homeViewModel" data-bind="event: {keydown: OnKeyDown, keyup: OnKeyUp }">
 
-        <svg width=960 height=960><g id="topoGraph" /></svg>
+        <svg width=960 height=500><g id="topoGraph" /></svg>
         <table cellpadding="10">
             <thead>
                 <tr>
@@ -46,6 +46,7 @@
             <br/>
             <ul style="list-style-type:disc">
                 <li style="color:red"> Hold Ctrl key and click on two endpoints to setup/ovveride a connection between them.</li>
+                <li style="color:red"> Hold Ctrl key and double click on an endpoints to remove it.</li>
                 <li style="color:red"> Hold Shift key and click on two endpoints to remove a connection between them.</li>
                 <li style="color:red"> Use Up/Down arrows to iterrate between connection behaviors.</li>
             </ul>

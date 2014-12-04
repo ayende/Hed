@@ -23,7 +23,7 @@
             $.ajax("/topology/view", "GET").done(function (x) {
                 _this.createGraph();
                 _this.generateNewGraphFromTopo(x, false);
-                _this.websocket = new WebSocket("ws://localhost:9091/");
+                _this.websocket = new WebSocket("ws://localhost:9091/websocket");
                 _this.websocket.onmessage = function (event) {
                     return _this.generateRequestStatistic(event.data);
                 };
@@ -45,6 +45,12 @@
                 });
             }
             this.redraw();
+        };
+        homeViewModel.prototype.removeNodeFromTopology = function (toRemoveNode) {
+            var _this = this;
+            $.ajax("/topology/removeEndpoint?" + "&url=" + encodeURIComponent(toRemoveNode), "GET").done(function (x) {
+                _this.generateNewGraphFromTopo(x, true);
+            });
         };
 
         /*    pushDatabaseUnique(dbName) {
@@ -199,22 +205,24 @@
             var svg = d3.select("svg"), inner = svg.select("g");
             this.svg = svg;
             this.inner = inner;
-
-            // Set up zoom support
-            var zoom = d3.behavior.zoom().on("zoom", function () {
-                inner.attr("transform", "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
-            });
-            this.zoom = zoom;
-            this.svg.call(zoom);
+            if (this.g.nodeCount() !== 0) {
+                // Set up zoom support
+                var zoom = d3.behavior.zoom().on("zoom", function () {
+                    inner.attr("transform", "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
+                });
+                this.zoom = zoom;
+                this.svg.call(zoom);
+            }
             this.renderer(this.inner, this.g);
-
-            // Center the graph
-            var initialScale = 0.75;
-            this.zoom.translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20]).scale(initialScale).event(this.svg);
-            this.svg.attr('height', this.g.graph().height * initialScale + 40);
-            inner.selectAll("g.node").attr('onclick', function (n) {
-                return 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");';
-            });
+            if (this.g.nodeCount() !== 0) {
+                // Center the graph
+                var initialScale = 0.75;
+                this.zoom.translate([(this.svg.attr("width") - this.g.graph().width * initialScale) / 2, 20]).scale(initialScale).event(this.svg);
+                this.svg.attr('height', this.g.graph().height * initialScale + 40);
+                inner.selectAll("g.node").attr('onclick', function (n) {
+                    return 'ko.dataFor(document.getElementById("homeViewModel")).onNodeClick("' + n + '");';
+                });
+            }
         };
 
         homeViewModel.prototype.OnKeyDown = function (event) {
@@ -246,7 +254,10 @@
                 if (this.selectedNode() === "") {
                     this.selectedNode(n);
                 } else {
-                    this.addEdgeCore(this.selectedNode(), n, this.behavior()[0]);
+                    if (this.selectedNode() === n)
+                        this.removeNodeFromTopology(n);
+                    else
+                        this.addEdgeCore(this.selectedNode(), n, this.behavior()[0]);
                     this.selectedNode("");
                 }
             } else if (this.shiftKeyPressed) {

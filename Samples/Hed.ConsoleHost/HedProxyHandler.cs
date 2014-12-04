@@ -80,31 +80,37 @@ namespace Hed.ConsoleHost
 			//request.RequestUri = path.To.AbsolutePath + urlToDest;
 		    request.RequestUri = urlToDest;
 		    HedResponse response;
-		    switch (path.Behavior)
+		    try
 		    {
-		        case ProxyBehavior.Optimal:
-		            response = await OptimalResponse(context, request, path);
-		            break;
-		        case ProxyBehavior.Slow:
-                    response = await SlowResponse(context, request, path);
-                    break;
-		        case ProxyBehavior.Normal:
-                    response = await NormalResponse(context, request, path);
-                    break;
-		        case ProxyBehavior.Hiccups:
-                    response = await HiccupResponse(context, request, path);
-                    break;
-		        case ProxyBehavior.Dropping:
-                    response = await DroppingResponse(context, request, path);
-                    break;
-		        case ProxyBehavior.Down:
-                    response = await DownResponse(context, request, path);
-                    break;
-		        default:
-		            throw new ArgumentOutOfRangeException();
+		        switch (path.Behavior)
+		        {
+		            case ProxyBehavior.Optimal:
+		                response = await OptimalResponse(context, request, path);
+		                break;
+		            case ProxyBehavior.Slow:
+		                response = await SlowResponse(context, request, path);
+		                break;
+		            case ProxyBehavior.Normal:
+		                response = await NormalResponse(context, request, path);
+		                break;
+		            case ProxyBehavior.Hiccups:
+		                response = await HiccupResponse(context, request, path);
+		                break;
+		            case ProxyBehavior.Dropping:
+		                response = await DroppingResponse(context, request, path);
+		                break;
+		            case ProxyBehavior.Down:
+		                response = await DownResponse(context, request, path);
+		                break;
+		            default:
+		                throw new ArgumentOutOfRangeException();
+		        }
 		    }
-		    var pathKey = string.Format("{0}=>{1}",path.From,path.To);
-            if (!Requests.ContainsKey(pathKey)) Requests.AddOrUpdate(pathKey, path.Operations, (key, val) => val);		                
+		    finally
+		    {
+		        var pathKey = string.Format("{0}=>{1}", path.From, path.To);
+                Requests.AddOrUpdate(pathKey, path.Operations, (key, val) => path.Operations);
+		    }
 		    return response;
 		}
 
